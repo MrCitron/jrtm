@@ -8,17 +8,31 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import {Button} from '@material-ui/core';
 import Grid from "@material-ui/core/Grid";
+import TextField from "@material-ui/core/TextField";
+import InputLabel from "@material-ui/core/InputLabel";
+import Select from "@material-ui/core/Select";
 
 class SimpleTable extends React.Component {
 
-    state = {
-        data: []
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: [],
+            form: {
+                name: '',
+                race: '',
+                profession: ''
+            }
+        };
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+    }
 
     componentDidMount() {
-        var headers = new Headers();
-        var myInit = {headers: headers}
-        headers.append("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTU5MzUyODkzOX0.jGiDuMeCjkSeBydgypsT5n3aSJVUQE7Wdolz0fNHjdewvtw4SuMHl7VwSAqp73CcxyxMXMOKL0swKAIWC_-u9A");
+        const headers = new Headers();
+        const myInit = {headers: headers};
+        headers.append("Authorization", "Bearer " + process.env.REACT_APP_TOKEN);
         fetch(process.env.REACT_APP_API_ENDPOINT + '/characters', myInit)
             .then((response) => response.json())
             .then(data => {
@@ -28,18 +42,68 @@ class SimpleTable extends React.Component {
     };
 
     handleClick() {
+        fetch(process.env.REACT_APP_API_ENDPOINT + '/characters', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + process.env.REACT_APP_TOKEN
+            },
+            body: JSON.stringify(this.state.form)
+        })
+            .then((response) => response.json())
+            .then(data => {
+                console.log(data);
+            });
+    }
 
+    handleChange(event) {
+        console.log(event.target.value);
+//        this.setState({form.name: event.target.value});
     }
 
     render() {
         return (
-            <Grid container spacing={3}>
-                <Grid item xs={12}>
+            <Grid container spacing={1}>
+                <Grid item xs={3}>
+                    <TextField label="Nom" variant="outlined"
+                               value={this.state.form.name}
+                               onChange={this.handleChange}/>
+                </Grid>
+                <Grid item xs={3}>
+                    <InputLabel htmlFor="race-select">Race</InputLabel>
+                    <Select
+                        native
+                        value={this.state.form.race}
+                        label="Race"
+                        id="race-select"
+                    >
+                        <option aria-label="None" value=""/>
+                        <option value={1}>Ten</option>
+                        <option value={2}>Twenty</option>
+                        <option value={3}>Thirty</option>
+                    </Select>
+                </Grid>
+                <Grid item xs={3}>
+                    <InputLabel htmlFor="profession-select">Profession</InputLabel>
+                    <Select
+                        native
+                        value={this.state.form.profession}
+                        label="Profession"
+                        id="profession-select"
+                    >
+                        <option aria-label="None" value=""/>
+                        <option value={1}>Ten</option>
+                        <option value={2}>Twenty</option>
+                        <option value={3}>Thirty</option>
+                    </Select>
+                </Grid>
+                <Grid item xs={3}>
                     <Button variant="contained" onClick={this.handleClick}>Ajouter</Button>
                 </Grid>
-                <Grid>
+                <Grid item xs={12}>
                     <TableContainer component={Paper}>
-                        <Table style={{width: '600px'}} aria-label="simple table">
+                        <Table aria-label="simple table">
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Nom</TableCell>
