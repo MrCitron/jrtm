@@ -11,6 +11,7 @@ import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 
 class CharacterTableWithAddNewForm extends React.Component {
 
@@ -28,6 +29,7 @@ class CharacterTableWithAddNewForm extends React.Component {
         };
 
         this.handleChange = this.handleChange.bind(this);
+        this.updateForm = this.updateForm.bind(this);
         this.handleAdd = this.handleAdd.bind(this);
 
         this.fetchRaces = this.fetchRaces.bind(this);
@@ -61,13 +63,15 @@ class CharacterTableWithAddNewForm extends React.Component {
             body: JSON.stringify(newCharacter)
         })
             .then((response) => response.json())
-            .then(this.fetchPlayers);
+            .then(this.fetchPlayers)
+            .catch(error => this.setState({error}));
         // .then(data => {
         //     console.log(data);
         // });
     };
 
-    handleDelete(id) {
+    handleDelete(id, event) {
+        event.preventDefault();
         if (id && id !== '') {
             fetch(process.env.REACT_APP_API_ENDPOINT + '/characters/' + id, {
                 method: 'DELETE',
@@ -75,7 +79,6 @@ class CharacterTableWithAddNewForm extends React.Component {
                     'Authorization': 'Bearer ' + process.env.REACT_APP_TOKEN
                 }
             })
-                .then((response) => response.json())
                 .then(this.fetchPlayers);
             // .then(data => {
             //     console.log(data);
@@ -87,7 +90,10 @@ class CharacterTableWithAddNewForm extends React.Component {
         const target = event.target;
         const value = target.value;
         const name = target.name;
+        this.updateForm(name, value);
+    }
 
+    updateForm(name, value) {
         const form = {...this.state.form}
         form[name] = value;
         this.setState({form});
@@ -102,11 +108,14 @@ class CharacterTableWithAddNewForm extends React.Component {
             // We get the API response and receive data in JSON format...
             .then(response => response.json())
             // ...then we update the users state
-            .then(data =>
+            .then(data => {
                 this.setState({
                     races: data
-                })
-            )
+                });
+                if (data.length > 0) {
+                    this.updateForm("race", data[0].id);
+                }
+            })
             // Catch any errors we hit and update the app
             .catch(error => this.setState({error}));
     }
@@ -120,11 +129,14 @@ class CharacterTableWithAddNewForm extends React.Component {
             // We get the API response and receive data in JSON format...
             .then(response => response.json())
             // ...then we update the users state
-            .then(data =>
+            .then(data => {
                 this.setState({
                     professions: data
-                })
-            )
+                });
+                if (data.length > 0) {
+                    this.updateForm("profession", data[0].id);
+                }
+            })
             // Catch any errors we hit and update the app
             .catch(error => this.setState({error}));
     }
@@ -196,6 +208,7 @@ class CharacterTableWithAddNewForm extends React.Component {
                                     <TableCell>Nom</TableCell>
                                     <TableCell>Race</TableCell>
                                     <TableCell>Profession</TableCell>
+                                    <TableCell>Actions</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -204,8 +217,9 @@ class CharacterTableWithAddNewForm extends React.Component {
                                         <TableCell>{row.name}</TableCell>
                                         <TableCell>{row.race != null ? row.race.name : ""}</TableCell>
                                         <TableCell>{row.profession != null ? row.profession.name : ""}</TableCell>
-                                        <TableCell><Button variant="contained" onClick={() => this.handleDelete(row.id)}
-                                                           value={row.id}>Supprimer</Button></TableCell>
+                                        <TableCell><Button variant="contained"
+                                                           onClick={this.handleDelete.bind(this, row.id)}
+                                                           value={row.id}><DeleteForeverIcon/></Button></TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
