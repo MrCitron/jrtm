@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {makeStyles} from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
@@ -8,7 +8,7 @@ import Box from '@material-ui/core/Box';
 import CharacterTableWithAddNewForm from "./components/CharacterTableWithAddNewForm"
 
 function TabPanel(props) {
-    const {children, value, index, ...other} = props;
+    const { children, value, index, ...other } = props;
 
     return (
         <div
@@ -74,10 +74,10 @@ export default function VerticalTabs() {
                 <Tab label="PNJ" {...a11yProps(1)} />
             </Tabs>
             <TabPanel value={value} index={0}>
-                <CharacterTableWithAddNewForm></CharacterTableWithAddNewForm>
+                <CharacterTableWithAddNewForm type="PC"></CharacterTableWithAddNewForm>
             </TabPanel>
             <TabPanel value={value} index={1}>
-                Item Two
+                <CharacterTableWithAddNewForm type="NPC"></CharacterTableWithAddNewForm>
             </TabPanel>
         </div>
     );

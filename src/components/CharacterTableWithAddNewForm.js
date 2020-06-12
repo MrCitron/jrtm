@@ -145,7 +145,7 @@ class CharacterTableWithAddNewForm extends React.Component {
         const headers = new Headers();
         const myInit = {headers: headers};
         headers.append("Authorization", "Bearer " + process.env.REACT_APP_TOKEN);
-        fetch(process.env.REACT_APP_API_ENDPOINT + '/characters', myInit)
+        fetch(process.env.REACT_APP_API_ENDPOINT + '/characters?type=' + this.props.type, myInit)
             .then((response) => response.json())
             .then(data => {
                 // console.log(data);
