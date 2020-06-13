@@ -46,6 +46,7 @@ class CharacterTableWithAddNewForm extends React.Component {
     handleAdd() {
         const newCharacter = {
             name: this.state.form.name,
+            type: this.props.type,
             race: {
                 id: parseInt(this.state.form.race)
             },
@@ -64,12 +65,13 @@ class CharacterTableWithAddNewForm extends React.Component {
         })
             .then((response) => response.json())
             .then(this.fetchPlayers)
+            .then(this.resetForm)
             .catch(error => this.setState({error}));
         // .then(data => {
         //     console.log(data);
         // });
     };
-
+    
     handleDelete(id, event) {
         event.preventDefault();
         if (id && id !== '') {
@@ -97,6 +99,18 @@ class CharacterTableWithAddNewForm extends React.Component {
         const form = {...this.state.form}
         form[name] = value;
         this.setState({form});
+    }
+
+    resetForm() {
+        // console.log("reset.Form");
+        // this.setState({form = {
+        //         name: '',
+        //         race: 0,
+        //         profession: 0
+        //     }});
+        // this.updateForm("name", "");
+        // this.updateForm("race", "Elfe_noldo");
+        // this.updateForm("profession", "Guerrier");
     }
 
     fetchRaces() {
