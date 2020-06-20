@@ -6,7 +6,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import {Button} from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -23,18 +23,21 @@ class CharacterTableWithAddNewForm extends React.Component {
             players: [],
             form: {
                 name: '',
+                level: '',
                 race: 0,
                 profession: 0
             }
         };
 
         this.handleChange = this.handleChange.bind(this);
-        this.updateForm = this.updateForm.bind(this);
         this.handleAdd = this.handleAdd.bind(this);
 
         this.fetchRaces = this.fetchRaces.bind(this);
         this.fetchProfessions = this.fetchProfessions.bind(this);
         this.fetchPlayers = this.fetchPlayers.bind(this);
+
+        this.updateForm = this.updateForm.bind(this);
+        this.resetForm = this.resetForm.bind(this);
     }
 
     componentDidMount() {
@@ -46,6 +49,7 @@ class CharacterTableWithAddNewForm extends React.Component {
     handleAdd() {
         const newCharacter = {
             name: this.state.form.name,
+            level: Number(this.state.form.level),
             type: this.props.type,
             race: {
                 id: parseInt(this.state.form.race)
@@ -66,12 +70,12 @@ class CharacterTableWithAddNewForm extends React.Component {
             .then((response) => response.json())
             .then(this.fetchPlayers)
             .then(this.resetForm)
-            .catch(error => this.setState({error}));
+            .catch(error => this.setState({ error }));
         // .then(data => {
         //     console.log(data);
         // });
     };
-    
+
     handleDelete(id, event) {
         event.preventDefault();
         if (id && id !== '') {
@@ -96,26 +100,25 @@ class CharacterTableWithAddNewForm extends React.Component {
     }
 
     updateForm(name, value) {
-        const form = {...this.state.form}
+        const form = { ...this.state.form }
         form[name] = value;
-        this.setState({form});
+        this.setState({ form });
     }
 
     resetForm() {
-        // console.log("reset.Form");
-        // this.setState({form = {
-        //         name: '',
-        //         race: 0,
-        //         profession: 0
-        //     }});
-        // this.updateForm("name", "");
-        // this.updateForm("race", "Elfe_noldo");
-        // this.updateForm("profession", "Guerrier");
+        this.setState({
+            form: {
+                name: '',
+                level: '',
+                race: 0,
+                profession: 0
+            }
+        });
     }
 
     fetchRaces() {
         const headers = new Headers();
-        const myInit = {headers: headers};
+        const myInit = { headers: headers };
         headers.append("Authorization", "Bearer " + process.env.REACT_APP_TOKEN);
         // Where we're fetching data from
         fetch(process.env.REACT_APP_API_ENDPOINT + '/races', myInit)
@@ -131,12 +134,12 @@ class CharacterTableWithAddNewForm extends React.Component {
                 }
             })
             // Catch any errors we hit and update the app
-            .catch(error => this.setState({error}));
+            .catch(error => this.setState({ error }));
     }
 
     fetchProfessions() {
         const headers = new Headers();
-        const myInit = {headers: headers};
+        const myInit = { headers: headers };
         headers.append("Authorization", "Bearer " + process.env.REACT_APP_TOKEN);
         // Where we're fetching data from
         fetch(process.env.REACT_APP_API_ENDPOINT + '/professions', myInit)
@@ -152,18 +155,18 @@ class CharacterTableWithAddNewForm extends React.Component {
                 }
             })
             // Catch any errors we hit and update the app
-            .catch(error => this.setState({error}));
+            .catch(error => this.setState({ error }));
     }
 
     fetchPlayers() {
         const headers = new Headers();
-        const myInit = {headers: headers};
+        const myInit = { headers: headers };
         headers.append("Authorization", "Bearer " + process.env.REACT_APP_TOKEN);
         fetch(process.env.REACT_APP_API_ENDPOINT + '/characters?type=' + this.props.type, myInit)
             .then((response) => response.json())
             .then(data => {
                 // console.log(data);
-                this.setState({players: data});
+                this.setState({ players: data });
             });
     };
 
@@ -181,9 +184,15 @@ class CharacterTableWithAddNewForm extends React.Component {
             <Grid container spacing={1}>
                 <Grid item xs={3}>
                     <TextField label="Nom" variant="outlined"
-                               name="name"
-                               value={this.state.form.name}
-                               onChange={this.handleChange}/>
+                        name="name"
+                        value={this.state.form.name}
+                        onChange={this.handleChange} />
+                </Grid>
+                <Grid item xs={3}>
+                    <TextField label="Niveau" variant="outlined"
+                        name="level"                       
+                        value={this.state.form.level}
+                        onChange={this.handleChange} />
                 </Grid>
                 <Grid item xs={3}>
                     <InputLabel htmlFor="race-select">Race</InputLabel>
@@ -220,6 +229,7 @@ class CharacterTableWithAddNewForm extends React.Component {
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Nom</TableCell>
+                                    <TableCell>Niveau</TableCell>
                                     <TableCell>Race</TableCell>
                                     <TableCell>Profession</TableCell>
                                     <TableCell>Actions</TableCell>
@@ -229,11 +239,12 @@ class CharacterTableWithAddNewForm extends React.Component {
                                 {this.state.players.map((row) => (
                                     <TableRow key={row.id}>
                                         <TableCell>{row.name}</TableCell>
+                                        <TableCell>{row.level}</TableCell>
                                         <TableCell>{row.race != null ? row.race.name : ""}</TableCell>
                                         <TableCell>{row.profession != null ? row.profession.name : ""}</TableCell>
                                         <TableCell><Button variant="contained"
-                                                           onClick={this.handleDelete.bind(this, row.id)}
-                                                           value={row.id}><DeleteForeverIcon/></Button></TableCell>
+                                            onClick={this.handleDelete.bind(this, row.id)}
+                                            value={row.id}><DeleteForeverIcon /></Button></TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
